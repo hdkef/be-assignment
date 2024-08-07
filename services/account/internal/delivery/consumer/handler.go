@@ -1,0 +1,12 @@
+package consumer
+
+import (
+	"github.com/hdkef/be-assignment/services/account/domain/usecase"
+	"github.com/streadway/amqp"
+)
+
+type ConsumerDelivery struct {
+	Conn      *amqp.Connection
+	UserUC    usecase.UserUsecase
+	AccountUC usecase.AccountUC
+}

@@ -1,0 +1,24 @@
+package entity
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type ENUM_QUEUED_TRX_STATUS string
+type ENUM_QUEUED_TRX_RESULT string
+
+const (
+	ENUM_QUEUED_TRX_STATUS_PENDING  ENUM_QUEUED_TRX_STATUS = "PENDING"
+	ENUM_QUEUED_TRX_STATUS_EXECUTED ENUM_QUEUED_TRX_STATUS = "EXECUTED"
+	ENUM_QUEUED_TRX_RESULT_SUCCESS  ENUM_QUEUED_TRX_RESULT = "SUCCESS"
+	ENUM_QUEUED_TRX_RESULT_FAILED   ENUM_QUEUED_TRX_RESULT = "FAILED"
+)
+
+type QueuedTrx struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	Result        ENUM_QUEUED_TRX_RESULT
+	ScheduleTrxID uuid.UUID
+}
