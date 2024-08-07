@@ -130,6 +130,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/HistoryResponse'
 
+  /account/additional-account:
+    post:
+      tags:
+        - account
+      summary: Create an additional account
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdditionalAccountRequest'
+      responses:
+        '200':
+          description: Successful account creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdditionalAccountResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -250,3 +271,23 @@ components:
               accId2:
                 type: string
                 format: uuid
+
+    AdditionalAccountRequest:
+      type: object
+      properties:
+        accType:
+          type: string
+          enum: [DEBIT]
+        accDesc:
+          type: string
+        currency:
+          type: string
+
+    AdditionalAccountResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
