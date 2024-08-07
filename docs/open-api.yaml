@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  title: Banking API
+  version: 1.0.0
+  description: API for a banking application including authentication and transaction operations
+
+servers:
+  - url: http://localhost:80
+
+paths:
+  /account/auth/signup:
+    post:
+      tags:
+       - account
+      summary: Sign up a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /account/auth/signin:
+    post:
+      tags:
+       - account
+      summary: Sign in an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigninRequest'
+      responses:
+        '200':
+          description: Successful signin
+          headers:
+            Front-Token:
+              schema:
+                type: string
+            St-Access-Token:
+              schema:
+                type: string
+            St-Refresh-Token:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /transaction/withdraw:
+    post:
+      tags:
+       - transaction
+      summary: Withdraw money from an account
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawRequest'
+      responses:
+        '200':
+          description: Successful withdrawal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
+  /transaction/send:
+    post:
+      tags:
+       - transaction
+      summary: Send money to another account
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendRequest'
+      responses:
+        '200':
+          description: Successful transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
+  /account/history:
+    get:
+      tags:
+       - account
+      summary: Get transaction history for an account
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: accId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Successful retrieval of history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    FormField:
+      type: object
+      properties:
+        id:
+          type: string
+        value:
+          type: string
+
+    SignupRequest:
+      type: object
+      properties:
+        formFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormField'
+
+    SigninRequest:
+      type: object
+      properties:
+        formFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormField'
+
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            timeJoined:
+              type: integer
+              format: int64
+            tenantIds:
+              type: array
+              items:
+                type: string
+
+    WithdrawRequest:
+      type: object
+      properties:
+        accId:
+          type: string
+          format: uuid
+        desc:
+          type: string
+        amount:
+          type: number
+          format: float
+
+    SendRequest:
+      type: object
+      properties:
+        accId:
+          type: string
+          format: uuid
+        desc:
+          type: string
+        amount:
+          type: number
+          format: float
+        toAccId:
+          type: string
+          format: uuid
+
+    TransactionResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    HistoryResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              reffNum:
+                type: string
+                format: uuid
+              createdAt:
+                type: string
+                format: date-time
+              accId:
+                type: string
+                format: uuid
+              trxType:
+                type: string
+                enum: [POSITIVE, NEGATIVE]
+              amount:
+                type: number
+              status:
+                type: string
+              desc:
+                type: string
+              accId2:
+                type: string
+                format: uuid

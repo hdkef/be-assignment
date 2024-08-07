@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: deploy/docs/Dockerfile
+    restart: always
+    ports:
+      - "8088:8080"
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - account
+      - transaction
+  migrations:
+    build:
+      context: .
+      dockerfile: deploy/migrations/Dockerfile
+    restart: always
+    env_file:
+     - migrations.env
+    depends_on:
+      - db
+  account:
+    build:
+      context: .
+      dockerfile: deploy/account/Dockerfile
+    restart: always
+    env_file:
+     - account.env
+    depends_on:
+      - db
+      - rabbitmq
+
+  transaction:
+    build:
+      context: .
+      dockerfile: deploy/transaction/Dockerfile
+    restart: always
+    env_file:
+     - transaction.env
+    depends_on:
+      - db
+      - rabbitmq
+
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_DB: postgres #for development purposes
+      POSTGRES_USER: postgres #for development purposes
+      POSTGRES_PASSWORD: postgres #for development purposes
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: user #for development purposes
+      RABBITMQ_DEFAULT_PASS: password #for development purposes
+    ports:
+      - "5679:5672"
+      - "15679:15672"
+
+volumes:
+  postgres_data:

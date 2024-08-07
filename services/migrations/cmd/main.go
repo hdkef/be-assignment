@@ -22,7 +22,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db, &postgres.Config{
+		DatabaseName: cfgPg.DBName,
+		SchemaName:   cfgPg.Schema,
+	})
 	if err != nil {
 		panic(err)
 	}

@@ -55,6 +55,7 @@ func (a *AccountUC) TransactionCreatedSend(ctx context.Context, dto et2.Transact
 		Amount:    dto.Detail.Amount,
 		Status:    entity.ENUM_HISTORY_STATUS(dto.Detail.Status),
 		Desc:      dto.Detail.Desc,
+		AccID2:    toAccId,
 	}
 
 	// credit history
@@ -67,6 +68,7 @@ func (a *AccountUC) TransactionCreatedSend(ctx context.Context, dto et2.Transact
 		Amount:    dto.Detail.Amount,
 		Status:    entity.ENUM_HISTORY_STATUS(dto.Detail.Status),
 		Desc:      dto.Detail.Desc,
+		AccID2:    accId,
 	}
 
 	// TODO insert bulk

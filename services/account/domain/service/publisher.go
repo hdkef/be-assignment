@@ -8,4 +8,5 @@ import (
 
 type Publisher interface {
 	PublishCreateUserEvents(ctx context.Context, dto *et2.UserCreatedEventDto) error
+	PublishCreateAccountEvents(ctx context.Context, dto *et2.AccountCreatedEventDto) error
 }

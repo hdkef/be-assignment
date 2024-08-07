@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/hdkef/be-assignment/pkg/delivery"
 	"github.com/hdkef/be-assignment/services/transaction/domain/entity"
 )
 
@@ -19,17 +20,20 @@ func (t *HttpHandler) Send(c *gin.Context) {
 
 	err := c.BindJSON(&req)
 	if err != nil {
-		panic(err)
+		delivery.HandleError(c, http.StatusBadRequest)
+		return
 	}
 
 	accId, err := uuid.Parse(req.AccID)
 	if err != nil {
-		panic(err)
+		delivery.HandleError(c, http.StatusBadRequest)
+		return
 	}
 
 	toAccId, err := uuid.Parse(req.ToAccID)
 	if err != nil {
-		panic(err)
+		delivery.HandleError(c, http.StatusBadRequest)
+		return
 	}
 
 	// build dto
@@ -43,8 +47,9 @@ func (t *HttpHandler) Send(c *gin.Context) {
 	// execute usecase
 	err = t.TransactionUC.Send(c, &dto)
 	if err != nil {
-		panic(err)
+		delivery.HandleError(c, http.StatusInternalServerError)
+		return
 	}
 
-	c.JSON(http.StatusOK, "")
+	delivery.HandleOK(c, nil)
 }

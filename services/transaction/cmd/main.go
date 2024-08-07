@@ -112,14 +112,20 @@ func main() {
 		TransactionUC: &trxUC,
 	}
 
-	router.POST("/withdraw", verifySessionMiddleware(nil), handlerHttp.Withdraw)
-	router.POST("/send", verifySessionMiddleware(nil), handlerHttp.Send)
+	if cfg.DEBUGMODE == "Y" {
+		router.POST("/withdraw", handlerHttp.Withdraw)
+		router.POST("/send", handlerHttp.Send)
+	} else {
+		router.POST("/withdraw", verifySessionMiddleware(nil), handlerHttp.Withdraw)
+		router.POST("/send", verifySessionMiddleware(nil), handlerHttp.Send)
+	}
 
 	// delivery consumer
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go handlerConsumer.SignUpEvent()
+	go handlerConsumer.AccountCreatedEvent()
 
 	err = router.Run(fmt.Sprintf(":%s", cfg.AppPort))
 	if err != nil {

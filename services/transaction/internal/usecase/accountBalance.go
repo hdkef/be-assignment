@@ -16,7 +16,49 @@ type AccountBalanceUC struct {
 }
 
 // CreateAccountBalance implements usecase.AccountBalanceUC.
-func (a *AccountBalanceUC) CreateAccountBalance(ctx context.Context, dto *entity2.UserCreatedEventDto) error {
+func (a *AccountBalanceUC) CreateAccountBalanceUserEvent(ctx context.Context, dto *entity2.UserCreatedEventDto) error {
+
+	userId, err := uuid.Parse(dto.UserID)
+	if err != nil {
+		return err
+	}
+
+	accId, err := uuid.Parse(dto.AccountID)
+	if err != nil {
+		return err
+	}
+
+	accBalance := entity.AccountBalance{
+		UserID:   userId,
+		Balance:  0,
+		AccID:    accId,
+		Currency: dto.AccountCurrency,
+	}
+
+	uow, err := a.UoW.NewUnitOfWork()
+	if err != nil {
+		uow.Tx.Rollback()
+		return err
+	}
+
+	err = a.AccBalanceRepo.CreateAccountBalance(ctx, &accBalance, uow)
+	if err != nil {
+		uow.Tx.Rollback()
+		return err
+	}
+
+	// commit trx
+	err = uow.Tx.Commit()
+	if err != nil {
+		uow.Tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+// CreateAccountBalance implements usecase.AccountBalanceUC.
+func (a *AccountBalanceUC) CreateAccountBalanceAccountEvent(ctx context.Context, dto *entity2.AccountCreatedEventDto) error {
 
 	userId, err := uuid.Parse(dto.UserID)
 	if err != nil {

@@ -7,5 +7,6 @@ import (
 )
 
 type AccountBalanceUC interface {
-	CreateAccountBalance(ctx context.Context, dto *entity.UserCreatedEventDto) error
+	CreateAccountBalanceUserEvent(ctx context.Context, dto *entity.UserCreatedEventDto) error
+	CreateAccountBalanceAccountEvent(ctx context.Context, dto *entity.AccountCreatedEventDto) error
 }

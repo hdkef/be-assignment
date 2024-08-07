@@ -58,6 +58,7 @@ func main() {
 		},
 		HistoryRepo: historyRepo,
 		AccountRepo: accRepo,
+		Publisher:   publisher,
 	}
 
 	// init delivery
@@ -70,6 +71,7 @@ func main() {
 
 	handlerHttp := &deliveryhttp.HttpHandler{
 		UserUsecase: &userUC,
+		AccUsecase:  &accountUC,
 	}
 	handlerConsumer := &deliveryConsumer.ConsumerDelivery{
 		Conn:      rbmqConn,
@@ -165,6 +167,13 @@ func main() {
 	})
 
 	// delivery http
+	if cfg.DEBUGMODE == "Y" {
+		router.GET("/history", verifySessionMiddleware(nil), handlerHttp.GetHistory)
+		router.POST("/additional-account", verifySessionMiddleware(nil), handlerHttp.CreateAccount)
+	} else {
+		router.GET("/history", verifySessionMiddleware(nil), handlerHttp.GetHistory)
+		router.POST("/additional-account", verifySessionMiddleware(nil), handlerHttp.CreateAccount)
+	}
 
 	// delivery consumer
 	sigs := make(chan os.Signal, 1)

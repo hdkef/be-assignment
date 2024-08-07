@@ -18,6 +18,7 @@ type AccountConfig struct {
 	WebDomain        string
 	SuperTokenUrl    string
 	SuperTokenAPIKey string
+	DEBUGMODE        string
 }
 
 func InitAccountConfig() *AccountConfig {
@@ -28,6 +29,7 @@ func InitAccountConfig() *AccountConfig {
 		WebDomain:        os.Getenv("WEB_DOMAIN"),
 		SuperTokenUrl:    os.Getenv("SUPER_TOKEN_URL"),
 		SuperTokenAPIKey: os.Getenv("SUPER_TOKEN_API_KEY"),
+		DEBUGMODE:        os.Getenv("DEBUG_MODE"),
 	}
 }
 

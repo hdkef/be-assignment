@@ -78,7 +78,7 @@ func (c *ConsumerDelivery) SignUpEvent() {
 			}
 
 			// execute usecase
-			err = c.AccBalanceUC.CreateAccountBalance(context.Background(), &dto)
+			err = c.AccBalanceUC.CreateAccountBalanceUserEvent(context.Background(), &dto)
 			if err != nil {
 				d.Reject(false)
 				continue

@@ -18,6 +18,7 @@ type TransactionConfig struct {
 	SuperTokenAPIKey string
 	APIDomain        string
 	AppName          string
+	DEBUGMODE        string
 }
 
 func InitTransactionConfig() *TransactionConfig {
@@ -28,6 +29,7 @@ func InitTransactionConfig() *TransactionConfig {
 		SuperTokenAPIKey: os.Getenv("SUPER_TOKEN_API_KEY"),
 		AppName:          os.Getenv("APP_NAME"),
 		APIDomain:        os.Getenv("API_DOMAIN"),
+		DEBUGMODE:        os.Getenv("DEBUG_MODE"),
 	}
 }
 
