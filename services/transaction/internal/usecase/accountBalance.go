@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	entity2 "github.com/hdkef/be-assignment/pkg/domain/entity"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/transaction/domain/entity"
 	repository2 "github.com/hdkef/be-assignment/services/transaction/domain/repository"
 	"github.com/hdkef/be-assignment/services/transaction/internal/repository"
@@ -20,11 +21,13 @@ func (a *AccountBalanceUC) CreateAccountBalanceUserEvent(ctx context.Context, dt
 
 	userId, err := uuid.Parse(dto.UserID)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	accId, err := uuid.Parse(dto.AccountID)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
@@ -37,12 +40,14 @@ func (a *AccountBalanceUC) CreateAccountBalanceUserEvent(ctx context.Context, dt
 
 	uow, err := a.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
 
 	err = a.AccBalanceRepo.CreateAccountBalance(ctx, &accBalance, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -50,6 +55,7 @@ func (a *AccountBalanceUC) CreateAccountBalanceUserEvent(ctx context.Context, dt
 	// commit trx
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -62,11 +68,13 @@ func (a *AccountBalanceUC) CreateAccountBalanceAccountEvent(ctx context.Context,
 
 	userId, err := uuid.Parse(dto.UserID)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	accId, err := uuid.Parse(dto.AccountID)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
@@ -79,12 +87,14 @@ func (a *AccountBalanceUC) CreateAccountBalanceAccountEvent(ctx context.Context,
 
 	uow, err := a.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
 
 	err = a.AccBalanceRepo.CreateAccountBalance(ctx, &accBalance, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -92,6 +102,7 @@ func (a *AccountBalanceUC) CreateAccountBalanceAccountEvent(ctx context.Context,
 	// commit trx
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}

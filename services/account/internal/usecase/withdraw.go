@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	et2 "github.com/hdkef/be-assignment/pkg/domain/entity"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/account/domain/entity"
 )
 
@@ -13,17 +14,20 @@ func (a *AccountUC) TransactionCreatedWithdraw(ctx context.Context, dto et2.Tran
 
 	accId, err := uuid.Parse(dto.Detail.AccID)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	reffNum, err := uuid.Parse(dto.ReffNum)
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	// begin trx
 	uow, err := a.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -31,6 +35,7 @@ func (a *AccountUC) TransactionCreatedWithdraw(ctx context.Context, dto et2.Tran
 	// update balance
 	err = a.AccountRepo.DecrementBalance(ctx, accId, dto.Detail.Amount, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -49,12 +54,14 @@ func (a *AccountUC) TransactionCreatedWithdraw(ctx context.Context, dto et2.Tran
 	// insert history
 	err = a.HistoryRepo.CreateHistory(ctx, &hist, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
 
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	et2 "github.com/hdkef/be-assignment/pkg/domain/entity"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/transaction/domain/entity"
 )
 
@@ -14,12 +15,14 @@ func (t *TransactionUC) Send(ctx context.Context, dto *entity.SendTransactionDto
 
 	err := dto.Validate()
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	// begin trx
 	uow, err := t.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -27,12 +30,14 @@ func (t *TransactionUC) Send(ctx context.Context, dto *entity.SendTransactionDto
 	// update balance
 	err = t.AccBalanceRepo.DecrementBalance(ctx, dto.AccID, dto.Amount, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
 
 	err = t.AccBalanceRepo.IncrementBalance(ctx, dto.ToAccID, dto.Amount, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -51,6 +56,7 @@ func (t *TransactionUC) Send(ctx context.Context, dto *entity.SendTransactionDto
 
 	err = t.TrxLogsRepo.CreateLogs(ctx, &trxLog, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -73,12 +79,14 @@ func (t *TransactionUC) Send(ctx context.Context, dto *entity.SendTransactionDto
 
 	err = t.Publisher.PublishCreateTransactionEvents(ctx, &trxCreatedEvent)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
 
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}

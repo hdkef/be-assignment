@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	entity2 "github.com/hdkef/be-assignment/pkg/domain/entity"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/account/domain/entity"
 	repository2 "github.com/hdkef/be-assignment/services/account/domain/repository"
 	"github.com/hdkef/be-assignment/services/account/domain/service"
@@ -27,11 +28,13 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 
 	err := dto.Validate()
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	uow, err := u.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
@@ -47,6 +50,7 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 
 	err = u.UserRepo.CreateUser(ctx, &user, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -64,6 +68,7 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 	}
 	err = u.UserAddressRepo.CreateAddress(ctx, &userAddress, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -79,6 +84,7 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 	}
 	err = u.AccountRepo.CreateAccount(ctx, &acc, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -86,6 +92,7 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 	// commit trx
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -98,6 +105,7 @@ func (u *UserUC) SignUp(ctx context.Context, dto *entity.UserSignUpDto) error {
 	}
 	err = u.Publisher.PublishCreateUserEvents(ctx, &userCreatedEventDto)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}

@@ -10,12 +10,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/account/config"
 	deliveryConsumer "github.com/hdkef/be-assignment/services/account/internal/delivery/consumer"
 	deliveryhttp "github.com/hdkef/be-assignment/services/account/internal/delivery/http"
 	"github.com/hdkef/be-assignment/services/account/internal/repository"
 	"github.com/hdkef/be-assignment/services/account/internal/service"
 	"github.com/hdkef/be-assignment/services/account/internal/usecase"
+	"github.com/sirupsen/logrus"
 	"github.com/supertokens/supertokens-golang/recipe/emailpassword"
 	"github.com/supertokens/supertokens-golang/recipe/emailpassword/epmodels"
 	"github.com/supertokens/supertokens-golang/recipe/session"
@@ -155,6 +157,9 @@ func main() {
 			supertokens.GetAllCORSHeaders()...),
 		AllowCredentials: true,
 	}))
+
+	var log = logrus.New()
+	router.Use(logger.LoggingMiddleware(log))
 
 	// Adding the SuperTokens middleware
 	router.Use(func(c *gin.Context) {

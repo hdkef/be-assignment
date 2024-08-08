@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	et2 "github.com/hdkef/be-assignment/pkg/domain/entity"
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/account/domain/entity"
 	repository2 "github.com/hdkef/be-assignment/services/account/domain/repository"
 	"github.com/hdkef/be-assignment/services/account/domain/service"
@@ -24,11 +25,13 @@ func (a *AccountUC) CreateAccount(ctx context.Context, dto *entity.CreateAccount
 
 	err := dto.Validate()
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
 	uow, err := a.UoW.NewUnitOfWork()
 	if err != nil {
+		logger.LogError(ctx, err)
 		return err
 	}
 
@@ -43,6 +46,7 @@ func (a *AccountUC) CreateAccount(ctx context.Context, dto *entity.CreateAccount
 	}
 	err = a.AccountRepo.CreateAccount(ctx, &acc, uow)
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -55,6 +59,7 @@ func (a *AccountUC) CreateAccount(ctx context.Context, dto *entity.CreateAccount
 	})
 
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -62,6 +67,7 @@ func (a *AccountUC) CreateAccount(ctx context.Context, dto *entity.CreateAccount
 	// commit trx
 	err = uow.Tx.Commit()
 	if err != nil {
+		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
 		return err
 	}
@@ -82,6 +88,7 @@ func (a *AccountUC) GetHistory(ctx context.Context, dto *entity.GetHistoryDto) (
 		Limit: dto.GetLimit(),
 	})
 	if err != nil {
+		logger.LogError(ctx, err)
 		return nil, err
 	}
 
