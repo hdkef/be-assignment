@@ -21,7 +21,7 @@ func (t *TransactionUC) ProcessAutodebetDaily(ctx context.Context) error {
 	}
 
 	// get schedule with status has not been checked and last checked < now and schedule daily
-	scheds, err := t.ScheduleRepo.GetUnprocessed(ctx, time.Now(), uow)
+	scheds, err := t.ScheduleRepo.GetUnprocessedDaily(ctx, time.Now(), uow)
 	if err != nil {
 		logger.LogError(ctx, err)
 		uow.Tx.Rollback()
@@ -35,7 +35,7 @@ func (t *TransactionUC) ProcessAutodebetDaily(ctx context.Context) error {
 			CreatedAt:     time.Now(),
 			ScheduleTrxID: sched.ID,
 			Status:        entity.ENUM_QUEUED_TRX_STATUS_PENDING,
-			Result:        "",
+			Result:        entity.ENUM_QUEUED_TRX_RESULT_FAILED,
 		}
 		err = t.QueueRepo.Create(ctx, &newQ, uow)
 		if err != nil {

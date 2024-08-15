@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hdkef/be-assignment/pkg/logger"
 	"github.com/hdkef/be-assignment/services/transaction/config"
 	"github.com/hdkef/be-assignment/services/transaction/internal/repository"
 	"github.com/hdkef/be-assignment/services/transaction/internal/service"
@@ -40,11 +41,11 @@ func main() {
 	ctx := context.Background()
 	err := trxUC.ProcessAutodebetDaily(ctx)
 	if err != nil {
-		fmt.Println("Error running usecase:", err)
+		logger.LogError(ctx, err)
 	}
 	err = trxUC.ProcessQueue(ctx)
 	if err != nil {
-		fmt.Println("Error running usecase:", err)
+		logger.LogError(ctx, err)
 	}
 
 	fmt.Println("CRON FINISHED")

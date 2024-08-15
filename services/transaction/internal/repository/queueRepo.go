@@ -55,7 +55,7 @@ func (q *QueueRepo) GetPending(ctx context.Context, uow *repository.UnitOfWork) 
 }
 
 // SetStatus implements repository.QueueRepository.
-func (q *QueueRepo) SetStatus(ctx context.Context, id uuid.UUID, status string, uow *repository.UnitOfWork) error {
+func (q *QueueRepo) SetStatus(ctx context.Context, id uuid.UUID, status entity.ENUM_QUEUED_TRX_STATUS, uow *repository.UnitOfWork) error {
 	query := `
 		UPDATE transactions.queued_trx
 		SET status = $1
@@ -68,6 +68,38 @@ func (q *QueueRepo) SetStatus(ctx context.Context, id uuid.UUID, status string, 
 		result, err = uow.Tx.ExecContext(ctx, query, status, id)
 	} else {
 		result, err = q.db.ExecContext(ctx, query, status, id)
+	}
+
+	if err != nil {
+		return fmt.Errorf("error updating queued transaction status: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error getting rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no queued transaction found with id %s", id)
+	}
+
+	return nil
+}
+
+// SetResult implements repository.QueueRepository.
+func (q *QueueRepo) SetResult(ctx context.Context, id uuid.UUID, res entity.ENUM_QUEUED_TRX_RESULT, uow *repository.UnitOfWork) error {
+	query := `
+		UPDATE transactions.queued_trx
+		SET result = $1
+		WHERE id = $2
+	`
+
+	var result sql.Result
+	var err error
+	if uow != nil {
+		result, err = uow.Tx.ExecContext(ctx, query, res, id)
+	} else {
+		result, err = q.db.ExecContext(ctx, query, res, id)
 	}
 
 	if err != nil {

@@ -72,7 +72,7 @@ CREATE TABLE transactions.transactions_logs (
 -- Create 'scheduled_trx' table
 CREATE TABLE transactions.scheduled_trx (
     id UUID PRIMARY KEY,
-    created TIMESTAMP,
+    created_at TIMESTAMP,
     status VARCHAR(10) CHECK (status IN ('ACTIVE', 'INACTIVE')),
     acc_id UUID REFERENCES transactions.accounts_balance(acc_id),
     type VARCHAR(10) CHECK (type IN ('SEND', 'WITHDRAW')),
@@ -87,7 +87,7 @@ CREATE TABLE transactions.scheduled_trx (
 CREATE TABLE transactions.queued_trx (
     id UUID PRIMARY KEY,
     created TIMESTAMP,
-    status VARCHAR(10) CHECK (status IN ('PENDING', 'EXECUTED')),
+    status VARCHAR(10) CHECK (status IN ('PENDING', 'EXECUTED','')),
     result VARCHAR(10) CHECK (result IN ('FAILED', 'SUCCESS')),
     schedule_trx_id UUID REFERENCES transactions.scheduled_trx(id)
 );

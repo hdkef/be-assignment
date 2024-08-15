@@ -125,9 +125,12 @@ func main() {
 	if cfg.DEBUGMODE == "Y" {
 		router.POST("/withdraw", handlerHttp.Withdraw)
 		router.POST("/send", handlerHttp.Send)
+		router.POST("/autodebet", handlerHttp.SetAutodebet)
 	} else {
 		router.POST("/withdraw", middleware.VerifySessionMiddleware(nil), handlerHttp.Withdraw)
-		router.POST("/send", middleware.VerifySessionMiddleware(nil), handlerHttp.Send)
+		router.POST("/send", middleware.VerifySessionMiddleware(nil), handlerHttp.SetAutodebet)
+		router.POST("/autodebet", middleware.VerifySessionMiddleware(nil), handlerHttp.SetAutodebet)
+
 	}
 
 	// delivery consumer

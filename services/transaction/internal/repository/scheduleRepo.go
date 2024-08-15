@@ -49,11 +49,11 @@ func (s *ScheduleRepo) Find(ctx context.Context, id uuid.UUID, uow *repository.U
 
 // GetUnprocessed implements repository.ScheduleRepository.
 // find last checked is < today and status active
-func (s *ScheduleRepo) GetUnprocessed(ctx context.Context, today time.Time, uow *repository.UnitOfWork) ([]*entity.ScheduleTrx, error) {
+func (s *ScheduleRepo) GetUnprocessedDaily(ctx context.Context, today time.Time, uow *repository.UnitOfWork) ([]*entity.ScheduleTrx, error) {
 	query := `
 		SELECT id, created_at, status, acc_id, type, schedule, to_acc_id, amount, has_checked, last_checked
 		FROM transactions.scheduled_trx
-		WHERE status = $1 AND (last_checked IS NULL OR last_checked < $2)
+		WHERE status = $1 AND (last_checked IS NULL OR last_checked < $2) AND schedule = 'DAILY'
 	`
 
 	var rows *sql.Rows
@@ -115,7 +115,7 @@ func (s *ScheduleRepo) UpdateChecked(ctx context.Context, ids []uuid.UUID, today
 // Create implements repository.ScheduleRepository.
 func (s *ScheduleRepo) Create(ctx context.Context, sched *entity.ScheduleTrx, uow *repository.UnitOfWork) error {
 	query := `
-		INSERT INTO transactions.accounts_balance (id, created, status, acc_id, type, amount, schedule, to_acc_id, has_checked, last_checked)
+		INSERT INTO transactions.scheduled_trx (id, created_at, status, acc_id, type, amount, schedule, to_acc_id, has_checked, last_checked)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
 

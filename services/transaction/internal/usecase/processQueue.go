@@ -36,6 +36,8 @@ func (t *TransactionUC) ProcessQueue(ctx context.Context) error {
 			continue
 		}
 
+		var isSuccess bool = true
+
 		switch item.Type {
 		case entity.ENUM_SCHEDULE_TYPE_SEND:
 			// handle send autodebet
@@ -49,17 +51,37 @@ func (t *TransactionUC) ProcessQueue(ctx context.Context) error {
 			err = t.Send(ctx, &dto)
 			if err != nil {
 				logger.LogError(ctx, err)
-				uow.Tx.Rollback()
-				continue
+				isSuccess = false
 			}
 		}
 
+		result := entity.ENUM_QUEUED_TRX_RESULT_SUCCESS
+
+		if !isSuccess {
+			result = entity.ENUM_QUEUED_TRX_RESULT_FAILED
+		}
+
 		// update status
+		err = t.QueueRepo.SetStatus(ctx, q.ID, entity.ENUM_QUEUED_TRX_STATUS_EXECUTED, uow)
+		if err != nil {
+			logger.LogError(ctx, err)
+			uow.Tx.Rollback()
+			continue
+		}
+
+		// update result
+		err = t.QueueRepo.SetResult(ctx, q.ID, result, uow)
+		if err != nil {
+			logger.LogError(ctx, err)
+			uow.Tx.Rollback()
+			continue
+		}
+
 		err = uow.Tx.Commit()
 		if err != nil {
 			logger.LogError(ctx, err)
 			uow.Tx.Rollback()
-			return err
+			continue
 		}
 	}
 

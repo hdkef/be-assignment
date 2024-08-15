@@ -31,12 +31,12 @@ func (t *TransactionUC) CreateAutodebet(ctx context.Context, dto *entity.CreateA
 		CreatedAt:   time.Now(),
 		Status:      entity.ENUM_SCHEDULE_TRX_STATUS_ACTIVE,
 		Type:        entity.ENUM_SCHEDULE_TYPE(dto.Type),
-		Schedule:    dto.Schedule,
+		Schedule:    entity.ENUM_SCHEDULE_SCHEDULE(dto.Schedule),
 		ToAccID:     dto.ToAccID,
 		AccID:       dto.AccID,
 		Amount:      dto.Amount,
 		HasChecked:  false,
-		LastChecked: time.Now(),
+		LastChecked: nil,
 	}
 
 	err = t.ScheduleRepo.Create(ctx, &trxLog, uow)
