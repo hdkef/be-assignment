@@ -1,77 +1,92 @@
-# Directory Structure
+# Project Structure Documentation
 
-## deploy
-this is where to put all the manifest or configuration files related to deployment.
-etc dockerfile yaml to build image
+## Table of Contents
+1. [Directory Structure](#directory-structure)
+2. [Deployment](#deployment)
+3. [API Documentation](#api-documentation)
 
-## docs
-this is where to put all the docs file includes swagger yaml for api documentation, usecase diagram (if exist)
-or maybe erd
+## Directory Structure
 
-## env
-this is where to put all the env example of the services / programs
+### `/deploy`
+Contains all manifest and configuration files related to deployment.
+- Dockerfile
+- YAML files for image building
 
-## pkg
-this is where to put all the common source code that can be used in multiple domain / context,
-etc you can put validate helper, common logger implementation, common entity etc
+### `/docs`
+Stores all documentation files, including:
+- Swagger YAML for API documentation
+- Use case diagrams (if applicable)
+- Entity-Relationship Diagrams (ERD)
 
-## services
-this is where to put all the source code corresponding to the specific services
+### `/env`
+Houses environment example files for all services and programs.
 
-## cmd
-in Golang, every project should have a main.go file and main function which is an entry point that will be compiled and executed
-by runtime process. This is where you put the main files and main function.
+### `/pkg`
+Contains common source code that can be used across multiple domains or contexts:
+- Validation helpers
+- Common logger implementations
+- Shared entities
 
-## config
-this is where to put the configuration initialization logic and validation
+### `/services`
+Holds all source code corresponding to specific services.
 
-## domain
-basically where to put all the domain definition or interfaces that need to be implemented.
+### `/cmd`
+In Go projects, this directory contains `main.go` files and `main()` functions, which serve as entry points for compilation and execution by the runtime process.
 
-### entity
-where to put all the objects needed
+### `/config`
+Stores configuration initialization logic and validation.
 
-### repository
-where to put interface about storing / manipulating data from / to datasource. It should not have complex logic as
-the main function of this layer is to do something with the datasource.
+### `/domain`
+Contains domain definitions and interfaces that need to be implemented.
 
-### usecase
-where to put interface about business logic, all the logic should be done in usecase layer or entity method
+#### `/domain/entity`
+Defines all required objects.
 
-### service
-where to put interface about 3rd party api call
+#### `/domain/repository`
+Specifies interfaces for storing and manipulating data from/to data sources. This layer should focus on data operations without complex logic.
 
-## internal
-basically where to put every implementation of the interfaces defined in the domain directory
+#### `/domain/usecase`
+Defines interfaces for business logic. All complex logic should be implemented in this layer or within entity methods.
 
-### delivery
-this is where to put all the logic about receiving request and responding request. People may call it controller.
-The single main thing this layer should do is to prepare an entity from the request and then execute a usecase and response.
+#### `/domain/service`
+Specifies interfaces for 3rd party API calls.
 
-let's say i have create user usecase, so in this layer i may create http delivery, websocket delivery, grpc delivery or consumer delivery
-that receives the request and execute create user usecase. 
+### `/internal`
+Houses implementations of interfaces defined in the `/domain` directory.
 
-### repository
-this is where to put all the real implementations about repository domain.
+#### `/internal/delivery`
+Contains logic for receiving and responding to requests (often called controllers).
+- Prepares entities from requests
+- Executes use cases
+- Formats responses
 
-let's say in the repository domain i have interface about create user, so in this layer i may create mysql repository or mongo repository that
-implement create user.
+Examples:
+- HTTP delivery
+- WebSocket delivery
+- gRPC delivery
+- Consumer delivery
 
-### usecase
+#### `/internal/repository`
+Implements repository interfaces defined in `/domain/repository`.
 
-this is where to put all the real implementations about usecase domain
+Example: For a "create user" interface in the domain, this layer might contain MySQL or MongoDB implementations.
 
-### service
+#### `/internal/usecase`
+Implements use case interfaces defined in `/domain/usecase`.
 
-this is where to put all the real implementations about service domain (3rd party API)
+#### `/internal/service`
+Implements service interfaces for 3rd party API calls defined in `/domain/service`.
 
+## Deployment
 
-# deployment
+To deploy the project using Docker Compose:
 
-$ docker compose up -d --build
+```bash
+docker compose up -d --build
+```
 
-# Swagger
+## API Documentation
 
-to view it, after deploying go to
+After deploying, view the Swagger documentation at:
 
-http://localhost:8088/swagger
+[http://localhost:8088/swagger](http://localhost:8088/swagger)
