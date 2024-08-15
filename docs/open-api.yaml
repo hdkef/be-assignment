@@ -113,6 +113,32 @@ paths:
               examples:
                 example1:
                   $ref: '#/components/examples/GeneralSuccessResponse'
+  /transaction/autodebet:
+    post:
+      tags:
+       - transaction
+      summary: Create autodebet money
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutodebetRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/AutodebetRequestExample'
+      responses:
+        '200':
+          description: Successful transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                example1:
+                  $ref: '#/components/examples/GeneralSuccessResponse'
   /account/history:
     get:
       tags:
@@ -180,6 +206,13 @@ components:
       value: 
         data: null
         message: "OK"
+    AutodebetRequestExample:
+      value: 
+        accId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
+        amount: 10000
+        toAccId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
+        type: SEND
+        schedule: SEND
     SendRequestExample:
       value: 
         accId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
@@ -304,6 +337,25 @@ components:
           format: uuid
         desc:
           type: string
+        amount:
+          type: number
+          format: float
+        toAccId:
+          type: string
+          format: uuid
+
+    AutodebetRequest:
+      type: object
+      properties:
+        accId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: ['SEND']
+        schedule:
+          type: string
+          enum: ['DAILY']
         amount:
           type: number
           format: float

@@ -27,6 +27,16 @@ services:
      - migrations.env
     depends_on:
       - db
+  transaction-cron:
+    build:
+      context: .
+      dockerfile: deploy/transaction-cron/Dockerfile
+    env_file:
+     - transaction-cron.env
+    depends_on:
+      - db
+      - transaction
+      - account
   account:
     build:
       context: .
