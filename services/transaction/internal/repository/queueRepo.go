@@ -17,7 +17,7 @@ type QueueRepo struct {
 // GetPending implements repository.QueueRepository.
 func (q *QueueRepo) GetPending(ctx context.Context, uow *repository.UnitOfWork) ([]entity.QueuedTrx, error) {
 	query := `
-		SELECT id, created, status, result, schedule_trx_id
+		SELECT id, created_at, status, result, schedule_trx_id
 		FROM transactions.queued_trx
 		WHERE status = $1
 	`

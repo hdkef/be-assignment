@@ -80,14 +80,14 @@ CREATE TABLE transactions.scheduled_trx (
     schedule VARCHAR(10),
     to_acc_id UUID,
     has_checked BOOLEAN,
-    last_checked DATE,
+    last_checked DATE
 );
 
 -- Create 'queued_trx' table
 CREATE TABLE transactions.queued_trx (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP,
-    status VARCHAR(10) CHECK (status IN ('PENDING', 'EXECUTED','')),
+    status VARCHAR(10) CHECK (status IN ('PENDING', 'EXECUTED')),
     result VARCHAR(10) CHECK (result IN ('FAILED', 'SUCCESS')),
     schedule_trx_id UUID REFERENCES transactions.scheduled_trx(id)
 );
