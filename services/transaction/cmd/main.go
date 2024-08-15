@@ -8,15 +8,14 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hdkef/be-assignment/pkg/logger"
+	"github.com/hdkef/be-assignment/pkg/middleware"
 	"github.com/hdkef/be-assignment/services/transaction/config"
 	deliveryConsumer "github.com/hdkef/be-assignment/services/transaction/internal/delivery/consumer"
 	deliveryhttp "github.com/hdkef/be-assignment/services/transaction/internal/delivery/http"
 	"github.com/sirupsen/logrus"
 	"github.com/supertokens/supertokens-golang/recipe/session"
-	"github.com/supertokens/supertokens-golang/recipe/session/sessmodels"
 	"github.com/supertokens/supertokens-golang/supertokens"
 
 	"github.com/hdkef/be-assignment/services/transaction/internal/repository"
@@ -87,17 +86,19 @@ func main() {
 
 	router := gin.New()
 
-	// CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{cfg.WebDomain},
-		AllowMethods: []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
-		AllowHeaders: append([]string{"content-type"},
-			supertokens.GetAllCORSHeaders()...),
-		AllowCredentials: true,
-	}))
-
 	var log = logrus.New()
 	router.Use(logger.LoggingMiddleware(log))
+
+	corsOrigin := os.Getenv("CORS_ALLOW_ORIGIN")
+	corsHeader := os.Getenv("CORS_ALLOW_HEADER")
+
+	debugMode := os.Getenv("DEBUG_MODE") == "Y" || os.Getenv("DEBUG_MODE") == ""
+	if debugMode {
+		corsOrigin = "*"
+		corsHeader = "*"
+	}
+
+	router.Use(middleware.CORSMiddleware(corsOrigin, corsHeader))
 
 	// Adding the SuperTokens middleware
 	router.Use(func(c *gin.Context) {
@@ -121,8 +122,8 @@ func main() {
 		router.POST("/withdraw", handlerHttp.Withdraw)
 		router.POST("/send", handlerHttp.Send)
 	} else {
-		router.POST("/withdraw", verifySessionMiddleware(nil), handlerHttp.Withdraw)
-		router.POST("/send", verifySessionMiddleware(nil), handlerHttp.Send)
+		router.POST("/withdraw", middleware.VerifySessionMiddleware(nil), handlerHttp.Withdraw)
+		router.POST("/send", middleware.VerifySessionMiddleware(nil), handlerHttp.Send)
 	}
 
 	// delivery consumer
@@ -138,32 +139,4 @@ func main() {
 	}
 
 	<-sigs
-}
-
-// verifySessionMiddleware adapts the Supertoken VerifySession function to work as a Gin middleware
-func verifySessionMiddleware(options *sessmodels.VerifySessionOptions) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var sessionVerified bool
-		var err error
-
-		session.VerifySession(options, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Session verified successfully
-			sessionVerified = true
-			// Update the Gin context with the new request that has the session information
-			c.Request = c.Request.WithContext(r.Context())
-		})).ServeHTTP(c.Writer, c.Request)
-
-		if !sessionVerified {
-			// Session verification failed
-			err = c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("unauthorized"))
-			if err != nil {
-				// If there's an error sending the response, log it
-				fmt.Printf("Error sending unauthorized response: %v\n", err)
-			}
-			return
-		}
-
-		// Continue with the next middleware/handler
-		c.Next()
-	}
 }

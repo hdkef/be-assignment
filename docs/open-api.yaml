@@ -19,6 +19,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignupRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/SignupRequestExample'
       responses:
         '200':
           description: Successful signup
@@ -38,6 +41,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SigninRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/SigninRequestExample'
       responses:
         '200':
           description: Successful signin
@@ -55,7 +61,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-
   /transaction/withdraw:
     post:
       tags:
@@ -69,6 +74,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WithdrawRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/WithdrawRequestExample'
       responses:
         '200':
           description: Successful withdrawal
@@ -76,7 +84,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
-
+              examples:
+                example1:
+                  $ref: '#/components/examples/GeneralSuccessResponse'
   /transaction/send:
     post:
       tags:
@@ -90,6 +100,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SendRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/SendRequestExample'
       responses:
         '200':
           description: Successful transfer
@@ -97,7 +110,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
-
+              examples:
+                example1:
+                  $ref: '#/components/examples/GeneralSuccessResponse'
   /account/history:
     get:
       tags:
@@ -110,18 +125,21 @@ paths:
           name: limit
           schema:
             type: integer
-          required: true
+          required: false
+          example: 10
         - in: query
           name: page
           schema:
             type: integer
-          required: true
+          required: false
+          example: 1
         - in: query
           name: accId
           schema:
             type: string
             format: uuid
           required: true
+          example: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
       responses:
         '200':
           description: Successful retrieval of history
@@ -143,6 +161,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AdditionalAccountRequest'
+            examples:
+                example1:
+                  $ref: '#/components/examples/AdditionalAccountRequestExample'
       responses:
         '200':
           description: Successful account creation
@@ -150,8 +171,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdditionalAccountResponse'
-
+              examples:
+                example1:
+                  $ref: '#/components/examples/GeneralSuccessResponse'
 components:
+  examples:
+    GeneralSuccessResponse:
+      value: 
+        data: null
+        message: "OK"
+    SendRequestExample:
+      value: 
+        accId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
+        desc: ini desc
+        amount: 10000
+        toAccId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
+    WithdrawRequestExample:
+      value: 
+        accId: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
+        desc: ini desc
+        amount: 10000
+    SigninRequestExample:
+      value:
+        formFields:
+          - id: email
+            value: email2@email.com
+          - id: password
+            value: password1@
+    AdditionalAccountRequestExample:
+      value: 
+        accType: DEBIT
+        accDesc: akun ku
+        accCurrency: IDR
+    SignupRequestExample:
+      value:
+        formFields:
+          - id: email
+            value: email2@email.com
+          - id: password
+            value: password1@
+          - id: name
+            value: name
+          - id: dateOfBirth
+            value: 2006-01-02
+          - id: job
+            value: job
+          - id: address
+            value: address
+          - id: district
+            value: district
+          - id: city
+            value: city
+          - id: province
+            value: province
+          - id: country
+            value: country
+          - id: accCurrency
+            value: IDR
+          - id: accDesc
+            value: akun ku
+          - id: zip
+            value: "123"
   securitySchemes:
     BearerAuth:
       type: http
@@ -250,27 +330,36 @@ components:
               id:
                 type: string
                 format: uuid
+                example: 73a97982-ddc7-484e-adca-03e3a8c62556
               reffNum:
                 type: string
                 format: uuid
+                example: 99505cf6-85ec-4ea4-af55-cc2cb334f4e7
               createdAt:
                 type: string
                 format: date-time
+                example: 2024-08-14 20:20:49.53606 +0000 +0000
               accId:
                 type: string
                 format: uuid
+                example: 12de0245-a77a-4001-a985-d2caebdf1493
               trxType:
                 type: string
                 enum: [POSITIVE, NEGATIVE]
+                example: NEGATIVE
               amount:
                 type: number
+                example: 10000
               status:
                 type: string
+                example: SUCCESS
               desc:
                 type: string
+                example: ini desc
               accId2:
                 type: string
                 format: uuid
+                example: 73a97982-ddc7-484e-adca-03e3a8c62556
 
     AdditionalAccountRequest:
       type: object

@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hdkef/be-assignment/pkg/logger"
+	"github.com/hdkef/be-assignment/pkg/middleware"
 	"github.com/hdkef/be-assignment/services/account/config"
 	deliveryConsumer "github.com/hdkef/be-assignment/services/account/internal/delivery/consumer"
 	deliveryhttp "github.com/hdkef/be-assignment/services/account/internal/delivery/http"
@@ -21,7 +21,6 @@ import (
 	"github.com/supertokens/supertokens-golang/recipe/emailpassword"
 	"github.com/supertokens/supertokens-golang/recipe/emailpassword/epmodels"
 	"github.com/supertokens/supertokens-golang/recipe/session"
-	"github.com/supertokens/supertokens-golang/recipe/session/sessmodels"
 	"github.com/supertokens/supertokens-golang/supertokens"
 )
 
@@ -149,17 +148,18 @@ func main() {
 
 	router := gin.New()
 
-	// CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{cfg.WebDomain},
-		AllowMethods: []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
-		AllowHeaders: append([]string{"content-type"},
-			supertokens.GetAllCORSHeaders()...),
-		AllowCredentials: true,
-	}))
-
 	var log = logrus.New()
 	router.Use(logger.LoggingMiddleware(log))
+
+	corsOrigin := os.Getenv("CORS_ALLOW_ORIGIN")
+	corsHeader := os.Getenv("CORS_ALLOW_HEADER")
+
+	debugMode := os.Getenv("DEBUG_MODE") == "Y" || os.Getenv("DEBUG_MODE") == ""
+	if debugMode {
+		corsOrigin = "*"
+		corsHeader = "*"
+	}
+	router.Use(middleware.CORSMiddleware(corsOrigin, corsHeader))
 
 	// Adding the SuperTokens middleware
 	router.Use(func(c *gin.Context) {
@@ -173,11 +173,11 @@ func main() {
 
 	// delivery http
 	if cfg.DEBUGMODE == "Y" {
-		router.GET("/history", verifySessionMiddleware(nil), handlerHttp.GetHistory)
-		router.POST("/additional-account", verifySessionMiddleware(nil), handlerHttp.CreateAccount)
+		router.GET("/history", middleware.VerifySessionMiddleware(nil), handlerHttp.GetHistory)
+		router.POST("/additional-account", middleware.VerifySessionMiddleware(nil), handlerHttp.CreateAccount)
 	} else {
-		router.GET("/history", verifySessionMiddleware(nil), handlerHttp.GetHistory)
-		router.POST("/additional-account", verifySessionMiddleware(nil), handlerHttp.CreateAccount)
+		router.GET("/history", middleware.VerifySessionMiddleware(nil), handlerHttp.GetHistory)
+		router.POST("/additional-account", middleware.VerifySessionMiddleware(nil), handlerHttp.CreateAccount)
 	}
 
 	// delivery consumer
@@ -192,32 +192,4 @@ func main() {
 	}
 
 	<-sigs
-}
-
-// verifySessionMiddleware adapts the Supertoken VerifySession function to work as a Gin middleware
-func verifySessionMiddleware(options *sessmodels.VerifySessionOptions) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var sessionVerified bool
-		var err error
-
-		session.VerifySession(options, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Session verified successfully
-			sessionVerified = true
-			// Update the Gin context with the new request that has the session information
-			c.Request = r
-		})).ServeHTTP(c.Writer, c.Request)
-
-		if !sessionVerified {
-			// Session verification failed
-			err = c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("unauthorized"))
-			if err != nil {
-				// If there's an error sending the response, log it
-				fmt.Printf("Error sending unauthorized response: %v\n", err)
-			}
-			return
-		}
-
-		// Continue with the next middleware/handler
-		c.Next()
-	}
 }
