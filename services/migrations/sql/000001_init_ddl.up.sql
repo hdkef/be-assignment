@@ -79,7 +79,8 @@ CREATE TABLE transactions.scheduled_trx (
     amount DECIMAL(10, 2),
     schedule VARCHAR(10),
     to_acc_id UUID,
-    has_checked BOOLEAN
+    has_checked BOOLEAN,
+    last_checked DATE,
 );
 
 -- Create 'queued_trx' table

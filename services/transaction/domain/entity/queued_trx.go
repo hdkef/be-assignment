@@ -20,5 +20,6 @@ type QueuedTrx struct {
 	ID            uuid.UUID
 	CreatedAt     time.Time
 	Result        ENUM_QUEUED_TRX_RESULT
+	Status        ENUM_QUEUED_TRX_STATUS
 	ScheduleTrxID uuid.UUID
 }

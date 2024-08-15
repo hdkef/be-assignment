@@ -16,13 +16,14 @@ const (
 )
 
 type ScheduleTrx struct {
-	ID         uuid.UUID
-	CreatedAt  time.Time
-	Status     ENUM_SCHEDULE_TRX_STATUS
-	AccID      uuid.UUID
-	Type       ENUM_SCHEDULE_TYPE
-	Schedule   string
-	ToAccID    uuid.UUID
-	Amount     float64
-	HasChecked bool
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	Status      ENUM_SCHEDULE_TRX_STATUS
+	AccID       uuid.UUID
+	Type        ENUM_SCHEDULE_TYPE
+	Schedule    string
+	ToAccID     uuid.UUID
+	Amount      float64
+	HasChecked  bool
+	LastChecked time.Time
 }

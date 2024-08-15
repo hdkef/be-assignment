@@ -35,6 +35,8 @@ func main() {
 
 	accBalanceRepo := repository.NewAccountBalanceRepo(db)
 	trxRepo := repository.NewTransactionLogsRepo(db)
+	scheduleRepo := repository.NewScheduleRepo(db)
+	queueRepo := repository.NewQueueRepo(db)
 
 	publisher := service.NewPublisher(rbmqConn)
 
@@ -51,7 +53,9 @@ func main() {
 		},
 		AccBalanceRepo: accBalanceRepo,
 		TrxLogsRepo:    trxRepo,
+		ScheduleRepo:   scheduleRepo,
 		Publisher:      publisher,
+		QueueRepo:      queueRepo,
 	}
 
 	ch, err := rbmqConn.Channel()

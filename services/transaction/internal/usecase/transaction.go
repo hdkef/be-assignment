@@ -11,6 +11,8 @@ type TransactionUC struct {
 	UoW            repo2.UnitOfWorkImplementor
 	AccBalanceRepo repository.AccountBalanceRepository
 	TrxLogsRepo    repository.TransactionLogsRepository
+	ScheduleRepo   repository.ScheduleRepository
+	QueueRepo      repository.QueueRepository
 	Publisher      service.Publisher
 }
 
