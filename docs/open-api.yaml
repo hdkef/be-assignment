@@ -202,7 +202,7 @@ components:
       value: 
         accType: DEBIT
         accDesc: akun ku
-        accCurrency: IDR
+        currency: IDR
     SignupRequestExample:
       value:
         formFields:
